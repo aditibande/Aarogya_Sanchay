@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { Message } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -30,8 +31,16 @@ function SimpleMarkdown({ text }: { text: string }) {
 }
 
 export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (viewportRef.current) {
+      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
   return (
-    <ScrollArea className="flex-1 p-4 md:p-6">
+    <ScrollArea className="flex-1 p-4 md:p-6" viewportRef={viewportRef}>
       <div className="flex flex-col gap-6">
         {messages.length === 0 && !isLoading && (
           <div className="text-center text-muted-foreground mt-8 p-4">
