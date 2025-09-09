@@ -25,11 +25,11 @@ export type HealthInformationInput = z.infer<typeof HealthInformationInputSchema
 const HealthInformationOutputSchema = z.object({
   answer: z
     .string()
-    .describe('The informative answer to the health-related question.'),
+    .describe('The informative answer to the health-related question. If the query is not medical, this should state that you can only answer medical questions.'),
   disclaimer: z
     .string()
     .describe(
-      'A disclaimer stating that the chatbot is not a substitute for professional medical advice.'
+      'A disclaimer stating that the chatbot is not a substitute for professional medical advice. This should be empty if the query is not medical.'
     ),
 });
 export type HealthInformationOutput = z.infer<typeof HealthInformationOutputSchema>;
@@ -44,18 +44,21 @@ const healthInformationPrompt = ai.definePrompt({
   name: 'healthInformationPrompt',
   input: {schema: HealthInformationInputSchema},
   output: {schema: HealthInformationOutputSchema},
-  prompt: `You are a helpful AI assistant providing information on common health questions.
+  prompt: `You are a helpful AI assistant exclusively for medical-related questions.
 
-  Answer the following question in the user's preferred language (if specified).  If no language is specified, answer in English.
+Your role is to provide information on health topics. You must not answer questions that are not related to health or medicine.
 
-  Make sure the response is accurate, informative, and easy to understand by a layperson.
+If the user asks a question that is not about medicine or health, you must politely decline and say that you can only answer medical-related questions. In this case, the 'disclaimer' field should be empty.
 
-  Also, ALWAYS include the following disclaimer in your response: "This chatbot is not a substitute for professional medical advice. Consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment."
+If the question is medical, answer the following question in the user's preferred language (if specified). If no language is specified, answer in English.
 
-  Question: {{{query}}}
-  Disclaimer: This chatbot is not a substitute for professional medical advice. Consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment.
+Make sure the response is accurate, informative, and easy to understand by a layperson.
 
-  Output in JSON format.
+If you provide a medical answer, ALWAYS include the following disclaimer in the 'disclaimer' field: "This chatbot is not a substitute for professional medical advice. Consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment."
+
+Question: {{{query}}}
+
+Output in JSON format.
   `,
 });
 

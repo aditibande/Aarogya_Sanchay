@@ -26,10 +26,11 @@ export default function Home() {
 
     try {
       const response = await getHealthInformation({ query: text, language });
+      const responseText = response.disclaimer ? `${response.answer}\n\n*${response.disclaimer}*` : response.answer;
 
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
-        text: `${response.answer}\n\n*${response.disclaimer}*`,
+        text: responseText,
         sender: 'ai',
         timestamp: Date.now(),
       };
