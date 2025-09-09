@@ -25,7 +25,7 @@ export type HealthInformationInput = z.infer<typeof HealthInformationInputSchema
 const HealthInformationOutputSchema = z.object({
   answer: z
     .string()
-    .describe('The informative answer to the health-related question. If the query is not medical, this should state that you can only answer medical questions.'),
+    .describe('The informative answer to the health-related question. If the query is not medical or about the website, this should state that you can only answer medical or website-related questions.'),
   disclaimer: z
     .string()
     .describe(
@@ -44,17 +44,19 @@ const healthInformationPrompt = ai.definePrompt({
   name: 'healthInformationPrompt',
   input: {schema: HealthInformationInputSchema},
   output: {schema: HealthInformationOutputSchema},
-  prompt: `You are a helpful AI assistant exclusively for medical-related questions.
+  prompt: `You are a helpful AI assistant for a website for migrant workers.
 
-Your role is to provide information on health topics. You must not answer questions that are not related to health or medicine.
+Your role is to provide information on two topics:
+1. Health-related questions.
+2. Questions about the website itself.
 
-If the user asks a question that is not about medicine or health, you must politely decline and say that you can only answer medical-related questions. In this case, the 'disclaimer' field should be empty.
+If the user asks a question that is not about medicine/health or the website, you must politely decline and say that you can only answer medical or website-related questions. In this case, the 'disclaimer' field should be empty.
 
-If the question is medical, answer the following question in the user's preferred language (if specified). If no language is specified, answer in English.
+Answer the following question in the user's preferred language (if specified). If no language is specified, answer in English.
 
-Make sure the response is accurate, informative, and easy to understand by a layperson.
+Make sure the response is accurate, informative, and easy to understand.
 
-If you provide a medical answer, ALWAYS include the following disclaimer in the 'disclaimer' field: "This chatbot is not a substitute for professional medical advice. Consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment."
+If you provide a medical answer, ALWAYS include the following disclaimer in the 'disclaimer' field: "This chatbot is not a substitute for professional medical advice. Consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment." If the question is about the website, the disclaimer field should be empty.
 
 Question: {{{query}}}
 
